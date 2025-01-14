@@ -1,0 +1,470 @@
+<!doctype html>
+<!--一个简易的听歌页面   上传音乐到GitHub，在songs里添加即可-->
+<!--未实现的功能：音量调节，列表循环-->
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Hi Music</title>
+	<style type="text/css">
+		:root{
+		--main: #3c5cad29;
+		}
+		*{
+		user-select:none;
+		}
+		.main{
+		margin: 100px auto;
+		width: 500px;
+		height: 650px;
+		border: 2px solid #CCCCFF;
+		border-radius: 25px;
+		box-shadow: 18px 18px 25px #666;
+		background-image: linear-gradient(to right, #eea2a2 0%, #bbc1bf 19%, #57c6e1 42%, #b49fda 79%, #7ac5d8 100%);
+		}
+		.main{
+		display: flex;
+		-webkit-flex-direction: column;
+		flex-direction: column;
+		justify-content: space-around;
+		align-items: center;
+		}
+		.ctrlBox{
+		margin: 20px auto;
+		width: 410px;
+		height: 180px;
+		border: 2px solid #9999FF;
+		box-shadow: 2px 2px 20px #666;
+		border-radius: 70px;
+		background: var(--main);
+		cursor: pointer;
+		display: flex;
+		-webkit-flex-direction: row;
+		flex-direction: row;
+		justify-content: space-around;
+		align-items: center;
+		transition: box-shadow 0.5s;
+		}
+		.ctrlBox:hover{
+		box-shadow: 9px 9px 25px #666;
+		}
+		
+		.headImg{
+		width: 130px;
+		height: 130px;
+		background: #6666CC;
+		border: 2px solid white;
+		border-radius: 50%;
+		box-shadow: 8px 8px 20px #444;
+		font-size: 80px;
+		line-height: 126px;
+		text-align: center;
+		}
+		#headAnima{
+		animation: dcdc 2s linear infinite alternate;
+		}
+		@keyframes dcdc{
+		  0%   {box-shadow: 3px 3px 10px #444;}
+		  25%  {box-shadow: 15px 15px 20px #444;}
+		  50%  {box-shadow: 8px 8px 15px #444;}
+		  100% {box-shadow: 25px 20px 25px #444;}
+		}
+		.songName{
+		width: 200px;
+		height: 30px;
+		font-size: 20px;
+		margin-bottom: 13px;
+		-o-text-overflow:ellipsis;
+		overflow:hidden;
+		}
+		
+		.btnBox{
+		width: 150px;
+		height: 50px;
+		//border: 2px solid white;
+		//border-radius: 20px;
+		display: flex;
+		-webkit-flex-direction: row;
+		flex-direction: row;
+		justify-content: space-around;
+		align-items: center;
+		}
+		#preSong{
+		width: 30px;
+		height: 30px;
+		background: #6666CC;
+		border: 2px solid white;
+		border-radius: 50%;
+		line-height:22px;
+		text-align: center;
+		font-size: 18px;
+		transition: width 0.2s,height 0.2s,box-shadow 0.2s;
+		}
+		#preSong:hover{
+		width: 35px;
+		height: 35px;
+		box-shadow: 5px 5px 5px #555;
+		}
+		#stopSong{
+		width: 40px;
+		height: 40px;
+		background: #6666CC;
+		border: 2px solid white;
+		border-radius: 50%;
+		line-height:37px;
+		text-align: center;
+		font-size: 22px;
+		transition: width 0.2s,height 0.2s,box-shadow 0.2s;
+		}
+		#stopSong:hover{
+		width: 45px;
+		height: 45px;
+		box-shadow: 5px 5px 5px #555;
+		}
+		#nextSong{
+		width: 30px;
+		height: 30px;
+		background: #6666CC;
+		border: 2px solid white;
+		border-radius: 50%;
+		line-height:22px;
+		text-align: center;
+		font-size: 18px;
+		transition: width 0.2s,height 0.2s,box-shadow 0.2s;
+		}
+		#nextSong:hover{
+		width: 35px;
+		height: 35px;
+		box-shadow: 5px 5px 5px #555;
+		}
+		#proBar{
+		width: 200px;
+		height: 9px;
+		margin: 5px 20px 5px 20px;
+		box-shadow: 5px 5px 8px #444;
+		border: 1px solid #6666CC;
+		border-radius: 15px;
+		margin-top: 10px;
+		}
+		progress::-webkit-progress-bar{
+		background-color: #d7d7d7;
+		border-radius: 15px;
+		}
+		progress::-webkit-progress-value{
+		 background-color: #6666CC;
+		}
+		.rightBox{
+		display: flex;
+		height: 130px;
+		-webkit-flex-direction: column;
+		flex-direction: column;
+		justify-content: space-around;
+		align-items: center;
+		}
+		.songList{
+		width: 440px;
+		height: 465px;
+		border: 2px solid #9999FF;
+		box-shadow: 5px 5px 6px #777;
+		border-radius: 9px;
+		background: var(--main);
+		cursor: pointer;
+		padding: 0px 5px;
+		display: flex;
+		-webkit-flex-direction: column;
+		flex-direction: column;
+		align-items: center;
+		margin-bottom: 10px;
+		overflow-y: scroll;
+		transition: box-shadow 0.4s;
+		}
+		.songList:hover{
+		box-shadow: 7px 7px 10px #666;
+		}
+		
+		::-webkit-scrollbar{
+		width:7px;
+		}
+		::-webkit-scrollbar-track-piece{
+		background-color: #c3c3ff;
+		-webkit-border-radius: 5px;
+		}  
+		::-webkit-scrollbar-thumb{
+		background-color: #6666CC;
+		-webkit-border-radius: 3px;
+		}  
+		
+		.song{
+		width: 400px;
+		height: 30px;
+		line-height: 30px;
+		color: #111;
+		margin-top: 5px;
+		border-radius: 9px;
+		padding:2px 10px;
+		cursor: pointer;
+		transition: box-shadow 0.2s,color 0.2s,background 0.2s;
+		}
+		.song:hover{
+		color: #660000;
+		background: #86c7d94f;
+		box-shadow: 5px 5px 5px #555;
+		}
+		.name{
+		display: inline-block;
+		}
+		
+		.loading{
+		float: right;
+		width: 25px;
+		height: 25px;
+		margin-top: 3px;
+		animation:turn 1s linear infinite;
+		visibility: hidden;
+		}
+		@keyframes turn{
+		  0%{-webkit-transform:rotate(0deg);}
+		  25%{-webkit-transform:rotate(90deg);}
+		  50%{-webkit-transform:rotate(180deg);}
+		  75%{-webkit-transform:rotate(270deg);}
+		  100%{-webkit-transform:rotate(360deg);}
+		}
+		
+		#playing{
+		animation-name: example;
+		animation-duration: 0.5s;
+		animation-iteration-count: infinite;
+		animation-direction: alternate;
+		}
+		@keyframes example {
+		  0%   {box-shadow: 0px 0px 0px #555;}
+		  25%  {box-shadow: 2px 2px 2px #555;}
+		  50%  {box-shadow: 4px 4px 4px #555;}
+		  100% {
+		  box-shadow: 5px 5px 5px #555;
+		  background: #5DBBD5;
+		  }
+		}
+	</style>
+</head>
+<body>
+	<div class="main" class="mainBox">
+		<div class="ctrlBox">
+			<div class="headImg">🥳</div>
+			<div class="rightBox">
+				<marquee class="songName" scrollamount="3"></marquee>
+				<div class="btnBox">
+					<div id="preSong">👈</div>
+					<div id="stopSong">🤐</div>
+					<div id="nextSong">👉</div>
+				</div>
+				<progress id="proBar" value="0" max="100"></progress>
+				<audio id="player"/>
+			</div>
+		</div>
+		
+		<div class="songList">
+			<div class="song"></div>
+		</div>
+	</div>
+	
+	<script type="text/javascript">
+		let songs = [{"name":"Bones","url":"https://github.com/litocc/litoMusic/blob/main/Bones.mp3?raw=true","author":""},{"name":"每段路","url":"https://github.com/SoungXin/Music/blob/main/%E6%AF%8F%E6%AE%B5%E8%B7%AF.mp3?raw=true","author":""},{"name":"似水流年","url":"https://github.com/litocc/litoMusic/blob/main/%E4%BC%BC%E6%B0%B4%E6%B5%81%E5%B9%B4%20-%20%E6%9D%8E%E5%81%A5.m4a?raw=true","author":""},{"name":"小城夏天","url":"https://github.com/litocc/litoMusic/blob/main/%E5%B0%8F%E5%9F%8E%E5%A4%8F%E5%A4%A9.mp3?raw=true","author":""},{"name":"挥着翅膀的女孩","url":"https://github.com/litocc/litoMusic/blob/main/%E6%8C%A5%E7%9D%80%E7%BF%85%E8%86%80%E7%9A%84%E5%A5%B3%E5%AD%A9.mp3?raw=true","author":""},{"name":"面会菜","url":"https://github.com/litocc/litoMusic/blob/main/%E9%9D%A2%E4%BC%9A%E8%8F%9C.mp3?raw=true","author":""},{"name":"memories","url":"https://github.com/litocc/litoMusic/blob/main/memories.mp3?raw=true","author":""},{"name":"for him","url":"https://github.com/litocc/litoMusic/blob/main/for%20him.flac?raw=true","author":""},{"name":"陪我看日出","url":"https://github.com/litocc/litoMusic/blob/main/%E9%99%AA%E6%88%91%E7%9C%8B%E6%97%A5%E5%87%BA.mp3?raw=true","author":""},{"name":"The Sound Of Silence","url":"https://github.com/litocc/litoMusic/blob/main/The%20Sound%20Of%20Silence.mp3?raw=true","author":""},{"name":"カノン","url":"https://github.com/litocc/litoMusic/blob/main/%E3%82%AB%E3%83%8E%E3%83%B3.mp3?raw=true","author":""},{"name":"All Falls Down","url":"https://github.com/litocc/litoMusic/blob/main/All%20Falls%20Down.mp3?raw=true","author":""},{"name":"Alone","url":"https://github.com/litocc/litoMusic/blob/main/Alone.mp3?raw=true","author":""},{"name":"Battles and Wastelands","url":"https://github.com/litocc/litoMusic/blob/main/Battles%20and%20Wastelands.mp3?raw=true","author":""},{"name":"Cold November","url":"https://github.com/litocc/litoMusic/blob/main/Cold%20November.mp3?raw=true","author":""},{"name":"Five Hundred Miles","url":"https://github.com/litocc/litoMusic/blob/main/Five%20Hundred%20Miles.mp3?raw=true","author":""},{"name":"Hero’s Come Back!!","url":"https://github.com/litocc/litoMusic/blob/main/Hero%E2%80%99s%20Come%20Back!!.mp3?raw=true","author":""},{"name":"Home on the Range","url":"https://github.com/litocc/litoMusic/blob/main/Home%20on%20the%20Range.mp3?raw=true","author":""},{"name":"Je ne sais pas choisir","url":"https://github.com/litocc/litoMusic/blob/main/Je%20ne%20sais%20pas%20choisir.mp3?raw=true","author":""},{"name":"Landing Guy","url":"https://github.com/litocc/litoMusic/blob/main/Landing%20Guy.mp3?raw=true","author":""},{"name":"Long Before Rock'N'Roll","url":"https://github.com/litocc/litoMusic/blob/main/Long%20Before%20Rock'N'Roll.mp3?raw=true","author":""},{"name":"Mine","url":"https://github.com/litocc/litoMusic/blob/main/Mine.mp3?raw=true","author":""},{"name":"PLANET","url":"https://github.com/litocc/litoMusic/blob/main/PLANET.mp3?raw=true","author":""},{"name":"Paprika","url":"https://github.com/litocc/litoMusic/blob/main/Paprika.mp3?raw=true","author":""},{"name":"Reality","url":"https://github.com/litocc/litoMusic/blob/main/Reality.mp3?raw=true","author":""},{"name":"Something Just Like This","url":"https://github.com/litocc/litoMusic/blob/main/Something%20Just%20Like%20This.mp3?raw=true","author":""},{"name":"Trouble Is A Friend","url":"https://github.com/litocc/litoMusic/blob/main/Trouble%20Is%20A%20Friend.mp3?raw=true","author":""},{"name":"Wake","url":"https://github.com/litocc/litoMusic/blob/main/Wake.mp3?raw=true","author":""},{"name":"one day","url":"https://github.com/litocc/litoMusic/blob/main/one%20day.mp3?raw=true","author":""},{"name":"やっぱり雨は降るんだね","url":"https://github.com/litocc/litoMusic/blob/main/%E3%82%84%E3%81%A3%E3%81%B1%E3%82%8A%E9%9B%A8%E3%81%AF%E9%99%8D%E3%82%8B%E3%82%93%E3%81%A0%E3%81%AD.mp3?raw=true","author":""},{"name":"スパークル (movie ver.)","url":"https://github.com/litocc/litoMusic/blob/main/%E3%82%B9%E3%83%91%E3%83%BC%E3%82%AF%E3%83%AB%20(movie%20ver.).mp3?raw=true","author":""},{"name":"ビンクスの酒","url":"https://github.com/litocc/litoMusic/blob/main/%E3%83%93%E3%83%B3%E3%82%AF%E3%82%B9%E3%81%AE%E9%85%92.mp3?raw=true","author":""},{"name":"一见钟情 (伍六七版)","url":"https://github.com/litocc/litoMusic/blob/main/%E4%B8%80%E8%A7%81%E9%92%9F%E6%83%85%20(%E4%BC%8D%E5%85%AD%E4%B8%83%E7%89%88).mp3?raw=true","author":""},{"name":"丫头","url":"https://github.com/litocc/litoMusic/blob/main/%E4%B8%AB%E5%A4%B4.mp3?raw=true","author":""},{"name":"伤心的人别听慢歌","url":"https://github.com/litocc/litoMusic/blob/main/%E4%BC%A4%E5%BF%83%E7%9A%84%E4%BA%BA%E5%88%AB%E5%90%AC%E6%85%A2%E6%AD%8C.mp3?raw=true","author":""},{"name":"倒带","url":"https://github.com/litocc/litoMusic/blob/main/%E5%80%92%E5%B8%A6.mp3?raw=true","author":""},{"name":"八月照相馆","url":"https://github.com/litocc/litoMusic/blob/main/%E5%85%AB%E6%9C%88%E7%85%A7%E7%9B%B8%E9%A6%86.mp3?raw=true","author":""},{"name":"初恋情人","url":"https://github.com/litocc/litoMusic/blob/main/%E5%88%9D%E6%81%8B%E6%83%85%E4%BA%BA.mp3?raw=true","author":""},{"name":"十点半的地铁","url":"https://github.com/litocc/litoMusic/blob/main/%E5%8D%81%E7%82%B9%E5%8D%8A%E7%9A%84%E5%9C%B0%E9%93%81.mp3?raw=true","author":""},{"name":"南山南","url":"https://github.com/litocc/litoMusic/blob/main/%E5%8D%97%E5%B1%B1%E5%8D%97.mp3?raw=true","author":""},{"name":"女孩子裙下到底有什么","url":"https://github.com/litocc/litoMusic/blob/main/%E5%A5%B3%E5%AD%A9%E5%AD%90%E8%A3%99%E4%B8%8B%E5%88%B0%E5%BA%95%E6%9C%89%E4%BB%80%E4%B9%88.mp3?raw=true","author":""},{"name":"如果有来生","url":"https://github.com/litocc/litoMusic/blob/main/%E5%A6%82%E6%9E%9C%E6%9C%89%E6%9D%A5%E7%94%9F.mp3?raw=true","author":""},{"name":"小薇","url":"https://github.com/litocc/litoMusic/blob/main/%E5%B0%8F%E8%96%87.mp3?raw=true","author":""},{"name":"广东十年爱情故事","url":"https://github.com/litocc/litoMusic/blob/main/%E5%B9%BF%E4%B8%9C%E5%8D%81%E5%B9%B4%E7%88%B1%E6%83%85%E6%95%85%E4%BA%8B.mp3?raw=true","author":""},{"name":"异乡人","url":"https://github.com/litocc/litoMusic/blob/main/%E5%BC%82%E4%B9%A1%E4%BA%BA.mp3?raw=true","author":""},{"name":"当你老了 (Live)","url":"https://github.com/litocc/litoMusic/blob/main/%E5%BD%93%E4%BD%A0%E8%80%81%E4%BA%86%20(Live).mp3?raw=true","author":""},{"name":"恋愛サーキュレーション","url":"https://github.com/litocc/litoMusic/blob/main/%E6%81%8B%E6%84%9B%E3%82%B5%E3%83%BC%E3%82%AD%E3%83%A5%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3.mp3?raw=true","author":""},{"name":"愛にできることはまだあるかい","url":"https://github.com/litocc/litoMusic/blob/main/%E6%84%9B%E3%81%AB%E3%81%A7%E3%81%8D%E3%82%8B%E3%81%93%E3%81%A8%E3%81%AF%E3%81%BE%E3%81%A0%E3%81%82%E3%82%8B%E3%81%8B%E3%81%84.mp3?raw=true","author":""},{"name":"我变了 我没变","url":"https://github.com/litocc/litoMusic/blob/main/%E6%88%91%E5%8F%98%E4%BA%86%20%E6%88%91%E6%B2%A1%E5%8F%98.mp3?raw=true","author":""},{"name":"我想和你一起去海边","url":"https://github.com/litocc/litoMusic/blob/main/%E6%88%91%E6%83%B3%E5%92%8C%E4%BD%A0%E4%B8%80%E8%B5%B7%E5%8E%BB%E6%B5%B7%E8%BE%B9.mp3?raw=true","author":""},{"name":"打上花火","url":"https://github.com/litocc/litoMusic/blob/main/%E6%89%93%E4%B8%8A%E8%8A%B1%E7%81%AB.mp3?raw=true","author":""},{"name":"无论你多怪异我还是会喜欢你","url":"https://github.com/litocc/litoMusic/blob/main/%E6%97%A0%E8%AE%BA%E4%BD%A0%E5%A4%9A%E6%80%AA%E5%BC%82%E6%88%91%E8%BF%98%E6%98%AF%E4%BC%9A%E5%96%9C%E6%AC%A2%E4%BD%A0.mp3?raw=true","author":""},{"name":"桃花笑","url":"https://github.com/litocc/litoMusic/blob/main/%E6%A1%83%E8%8A%B1%E7%AC%91.mp3?raw=true","author":""},{"name":"连备胎都不是","url":"https://github.com/litocc/litoMusic/blob/main/%E6%B2%99%E6%80%BB%E5%95%8A%20-%20%E8%BF%9E%E5%A4%87%E8%83%8E%E9%83%BD%E4%B8%8D%E6%98%AF%20(%E5%9B%9E%E5%BF%86%C2%B7%E5%A5%B3%E7%94%9F%E7%89%88).mp3?raw=true","author":""},{"name":"涙そうそう","url":"https://github.com/litocc/litoMusic/blob/main/%E6%B6%99%E3%81%9D%E3%81%86%E3%81%9D%E3%81%86.mp3?raw=true","author":""},{"name":"父亲写的散文诗","url":"https://github.com/litocc/litoMusic/blob/main/%E7%88%B6%E4%BA%B2%E5%86%99%E7%9A%84%E6%95%A3%E6%96%87%E8%AF%97.mp3?raw=true","author":""},{"name":"狮子座","url":"https://github.com/litocc/litoMusic/blob/main/%E7%8B%AE%E5%AD%90%E5%BA%A7.mp3?raw=true","author":""},{"name":"男子高校生と少年时代","url":"https://github.com/litocc/litoMusic/blob/main/%E7%94%B7%E5%AD%90%E9%AB%98%E6%A0%A1%E7%94%9F%E3%81%A8%E5%B0%91%E5%B9%B4%E6%97%B6%E4%BB%A3.mp3?raw=true","author":""},{"name":"白船","url":"https://github.com/litocc/litoMusic/blob/main/%E7%99%BD%E8%88%B9.mp3?raw=true","author":""},{"name":"翼をください","url":"https://github.com/litocc/litoMusic/blob/main/%E7%BF%BC%E3%82%92%E3%81%8F%E3%81%A0%E3%81%95%E3%81%84.mp3?raw=true","author":""},{"name":"花に亡霊","url":"https://github.com/litocc/litoMusic/blob/main/%E8%8A%B1%E3%81%AB%E4%BA%A1%E9%9C%8A.mp3?raw=true","author":""},{"name":"车站 (Live)","url":"https://github.com/litocc/litoMusic/blob/main/%E8%BD%A6%E7%AB%99%20(Live).mp3?raw=true","author":""},{"name":"长相厮守","url":"https://github.com/litocc/litoMusic/blob/main/%E9%95%BF%E7%9B%B8%E5%8E%AE%E5%AE%88.mp3?raw=true","author":""},{"name":"长镜头 (Live)","url":"https://github.com/litocc/litoMusic/blob/main/%E9%95%BF%E9%95%9C%E5%A4%B4%20(Live).mp3?raw=true","author":""},{"name":"阿珍爱上了阿强","url":"https://github.com/litocc/litoMusic/blob/main/%E9%98%BF%E7%8F%8D%E7%88%B1%E4%B8%8A%E4%BA%86%E9%98%BF%E5%BC%BA.mp3?raw=true","author":""},{"name":"骄傲的少年","url":"https://github.com/litocc/litoMusic/blob/main/%E9%AA%84%E5%82%B2%E7%9A%84%E5%B0%91%E5%B9%B4.mp3?raw=true","author":""},{"name" : "忽然之间","url" : "http://xinsheng.huawei.com/cn/index.php?app=home&mod=Attach&act=showdataattach&savepath=2013/0109/08/&savename=50ecbae04b91e.mp3","author":""},{"name" : "Burn the House Down","url" : "https://github.com/litocc/litoMusic/blob/main/Burn%20the%20House%20Down.mp3?raw=true","author":""}]
+		
+		let heads = ["😀","😊","😲","🤬","😜","😉","😶","😆","🙄","🤗","💕","😱","🤡","🤥","🤧"]
+		
+		let songListDiv = document.getElementsByClassName("songList")[0]	//直接写 songListDiv.appendChild(para) 会报错！
+		
+		let songNameDiv = document.getElementsByClassName("songName")[0]	//取到的songNameDiv是一个假数组
+		songNameDiv.innerHTML = songs[0].name
+		
+		let audio = document.getElementById("player")
+		audio.loop = true
+		
+		let headImgDiv = document.getElementsByClassName("headImg")[0]  //头像
+		
+		//按键
+		let stopBtn = document.getElementById("stopSong")
+		let preBtn = document.getElementById("preSong")
+		let nextBtn = document.getElementById("nextSong")
+		
+		let progressBar = document.getElementById("proBar")	//进度条
+		progressBar.max = 0
+		
+		let playingSong = null	//正在播放的歌曲
+		
+		let playFlag = true	//暂停播放
+		
+		let paras = []
+		let index = 0
+		
+		let songDivs = []
+		
+		
+		songs.forEach(function(item){
+			//console.log(item["name"])
+			var para = document.createElement("div");
+			para.className = "song"
+			//para.innerHTML = item.name
+			para.innerHTML = '<div class="name">'+item.name+'</div><svg class="loading" t="1638150230960" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1360"><path d="M980.752 313.697c-25.789-60.972-62.702-115.725-109.713-162.736-47.012-47.011-101.764-83.924-162.736-109.713C645.161 14.542 578.106 1 509 1c-2.242 0-4.48 0.015-6.715 0.043-16.567 0.211-29.826 13.812-29.615 30.38 0.209 16.438 13.599 29.618 29.99 29.618l0.39-0.002c1.98-0.026 3.963-0.039 5.95-0.039 61.033 0 120.224 11.947 175.93 35.508 53.82 22.764 102.162 55.359 143.683 96.879s74.115 89.862 96.88 143.683C949.054 392.776 961 451.967 961 513c0 16.568 13.432 30 30 30s30-13.432 30-30c0-69.106-13.541-136.162-40.248-199.303z" p-id="1361" fill="#4444CC"></path></svg>'
+			para.songUrl = item.url
+			para.ondblclick = ClickPlayMusic
+			songListDiv.appendChild(para)	
+			songDivs = document.getElementsByClassName("song")	//取所有歌曲div集合
+			songDivs = Array.from(songDivs)	//假数组转化为真数组
+		})
+		
+		function ClickPlayMusic(event){
+			if(playingSong==event.currentTarget){
+				console.log("r")
+				return
+			}
+			console.log(event.currentTarget)
+			//if(event.target!=this) return;
+			//PlayMusic(event.target)
+			PlayMusic(event.currentTarget)
+			
+			paras.push(event.currentTarget)	//双击播放过的歌放这里！
+			if(paras.length >= 2){
+				paras[paras.length-2].removeAttribute("id")	//去掉上一首歌的 playing id
+			}		
+		}
+		
+		//播放
+		function PlayMusic(songDiv){
+			if(playingSong != null){
+				playingSong.children[1].style.visibility="hidden";	//当上一首歌还未加载出来时，切换下一首，将上一首的加载图标去掉
+				playingSong.removeAttribute("id")
+			}
+			songNameDiv.innerHTML = songDiv.innerHTML
+			songDiv.setAttribute("id","playing")
+			audio.pause()
+			progressBar.max = 0
+			progressBar.value = 0
+			audio.src = songDiv.songUrl  //音乐的路径
+			 
+			audio.play()
+			playingSong = songDiv
+			playingSong.children[1].style.visibility="visible";		//设置加载标签显示
+			
+			headImgDiv.innerHTML = heads[randomNum(0,heads.length-1)]
+			headImgDiv.setAttribute("id","headAnima")
+		}
+		
+		stopBtn.onclick = function PauseMusic(){
+			if(playFlag){
+				audio.pause()
+				playFlag = false
+				stopBtn.innerHTML = "🥳"
+				headImgDiv.removeAttribute("id","headAnima")
+			}
+			else{
+				audio.play()
+				playFlag = true
+				stopBtn.innerHTML = "🤐"
+				headImgDiv.setAttribute("id","headAnima")
+			}
+		}
+		
+		preBtn.onclick = function PreMusic(){
+			if(paras.length >= 1){
+				for(var i=0; i <= paras.length-1; i++){
+					if(playingSong.songUrl == paras[i].songUrl){
+						console.log(i)
+							if(i != 0){
+								//console.log("ok")
+								//playingSong.removeAttribute("id")
+								PlayMusic(paras[i-1])
+							}else{
+								for(var i=0; i<songDivs.length-1; i++){
+									if(playingSong.songUrl == songDivs[i].songUrl && i>1){
+										playingSong.removeAttribute("id")
+										PlayMusic(songDivs[i-1])
+										paras.unshift(songDivs[i-1])
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			
+		nextBtn.onclick = function NextMusic(){
+			if(paras.length > 0){
+				for(var i=0; i <= paras.length-1; i++){
+					if(playingSong.songUrl == paras[i].songUrl){
+						if(i+1 != paras.length){
+							//playingSong.removeAttribute("id")
+							PlayMusic(paras[i+1])
+							return
+						}else{
+							for(var i=0; i<songDivs.length-1; i++){
+								if(playingSong.songUrl == songDivs[i].songUrl){
+									//playingSong.removeAttribute("id")
+									PlayMusic(songDivs[i+1])
+									paras.push(songDivs[i+1])
+									return
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		ShowCurrentTime = function(){
+			if(!isNaN(audio.duration) && progressBar.max != audio.duration){
+				playingSong.children[1].style.visibility="hidden";		//设置加载标签隐藏
+				progressBar.max = audio.duration
+			}
+			progressBar.value = audio.currentTime
+			//随机播放
+			if(progressBar.value + 0.5 >= audio.duration){
+				var num1 = randomNum(1,songDivs.length)
+				var temp = songDivs[num1]
+				console.log("随机数字为：" + num1)
+				console.log("随机歌曲为：" + temp.innerText)
+				PlayMusic(temp)
+				paras.push(temp)
+				console.log("push ok")
+				console.log(temp)
+				if(paras.length >= 2){
+					paras[paras.length-2].removeAttribute("id")	//去掉上一首歌的 playing id
+				}
+			}
+		}
+		
+		ChangePro = function(event){
+			if(progressBar.max!=0){
+				//console.log(event.offsetX)
+				var prePx = progressBar.max / progressBar.offsetWidth
+				//console.log("prepx: " + progressBar.max + " / " + progressBar.offsetWidth + " = " + prePx)
+				progressBar.value = prePx * event.offsetX
+				audio.currentTime = prePx * event.offsetX
+			}
+		}
+		
+		//生成[minNum,maxNum]区间的随机数
+		function randomNum(minNum,maxNum){ 
+			switch(arguments.length){ 
+				case 1: 
+					return parseInt(Math.random()*minNum+1,10); 
+				break; 
+				case 2: 
+					return parseInt(Math.random()*(maxNum-minNum+1)+minNum,10); 
+				break; 
+					default: 
+						return 0; 
+					break; 
+			} 
+		} 
+		
+		window.onload=function(){
+			audio.ontimeupdate = ShowCurrentTime
+			progressBar.onclick = ChangePro
+		}
+	</script>
+</body>
+</html>
